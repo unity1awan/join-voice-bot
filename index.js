@@ -1,4 +1,6 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { buildMessage } = require('./lib/buildMessage');
+const { enqueueAnnouncement, leaveIfAlone } = require('./lib/voicePlayer');
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -15,7 +17,26 @@ client.once(Events.ClientReady, (readyClient) => {
   console.log(`Inloggad som ${readyClient.user.tag}`);
 });
 
+// Without a listener, an 'error' event would crash the bot.
+client.on(Events.Error, (error) => {
+  console.error(`Discord-fel: ${error.message}`);
+});
+
 client.on(Events.VoiceStateUpdate, (oldState, newState) => {
+  try {
+    handleVoiceStateUpdate(oldState, newState);
+  } catch (error) {
+    console.error(`Fel vid hantering av röstkanalshändelse: ${error.message}`);
+  }
+});
+
+function handleVoiceStateUpdate(oldState, newState) {
+  announceJoin(oldState, newState);
+  // Someone may have left the bot's channel.
+  leaveIfAlone(newState.guild);
+}
+
+function announceJoin(oldState, newState) {
   const isInChannelNow = newState.channelId !== null;
   const hasChangedChannel = newState.channelId !== oldState.channelId;
 
@@ -23,10 +44,17 @@ client.on(Events.VoiceStateUpdate, (oldState, newState) => {
     return;
   }
 
-  const memberName = newState.member.displayName;
+  const member = newState.member;
+  if (!member || member.user.bot) {
+    return;
+  }
+
+  const memberName = member.displayName;
   const channelName = newState.channel.name;
   console.log(`${memberName} gick in i ${channelName}`);
-});
+
+  enqueueAnnouncement(newState.channel, buildMessage(memberName));
+}
 
 client.login(token).catch((error) => {
   console.error('Kunde inte logga in. Kontrollera DISCORD_TOKEN i .env.');
