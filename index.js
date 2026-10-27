@@ -1,5 +1,6 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { buildMessage } = require('./lib/buildMessage');
+const { loadSpeechModel } = require('./lib/textToSpeech');
 const { enqueueAnnouncement, leaveIfAlone } = require('./lib/voicePlayer');
 
 const token = process.env.DISCORD_TOKEN;
@@ -55,6 +56,14 @@ function announceJoin(oldState, newState) {
 
   enqueueAnnouncement(newState.channel, buildMessage(memberName));
 }
+
+// Load the speech model while logging in, so the first announcement is fast.
+console.log('Laddar talmodellen...');
+loadSpeechModel()
+  .then(() => console.log('Talmodellen är laddad.'))
+  .catch((error) => {
+    console.error(`${error.message} Försöker igen vid nästa uppläsning.`);
+  });
 
 client.login(token).catch((error) => {
   console.error('Kunde inte logga in. Kontrollera DISCORD_TOKEN i .env.');
