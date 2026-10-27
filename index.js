@@ -7,10 +7,25 @@ if (!token) {
   process.exit(1);
 }
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+});
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Inloggad som ${readyClient.user.tag}`);
+});
+
+client.on(Events.VoiceStateUpdate, (oldState, newState) => {
+  const isInChannelNow = newState.channelId !== null;
+  const hasChangedChannel = newState.channelId !== oldState.channelId;
+
+  if (!isInChannelNow || !hasChangedChannel) {
+    return;
+  }
+
+  const memberName = newState.member.displayName;
+  const channelName = newState.channel.name;
+  console.log(`${memberName} gick in i ${channelName}`);
 });
 
 client.login(token).catch((error) => {
