@@ -2,8 +2,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 // kokoro-js is ESM but also ships a CommonJS build, which require() picks.
 const { KokoroTTS } = require('kokoro-js');
+const settings = require('../data/settings');
 
-const MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 const TEXT = 'Aone has joined';
 const OUTPUT_DIR = path.join(__dirname, '..', 'samples');
 
@@ -11,10 +11,8 @@ async function main() {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   console.log('Laddar modellen (första gången laddas den ner)...');
-  const tts = await KokoroTTS.from_pretrained(MODEL_ID, {
-    dtype: 'q8',
-    device: 'cpu',
-  });
+  const { modelId, dtype, device } = settings.speech;
+  const tts = await KokoroTTS.from_pretrained(modelId, { dtype, device });
 
   const voices = Object.keys(tts.voices);
   console.log(`Gör ${voices.length} röstprov med texten "${TEXT}".`);

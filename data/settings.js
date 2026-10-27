@@ -1,5 +1,4 @@
 module.exports = {
-  // Local text-to-speech with kokoro-js.
   speech: {
     modelId: 'onnx-community/Kokoro-82M-v1.0-ONNX',
     // British English, male. Run "npm run samples" to hear all voices.
@@ -9,10 +8,8 @@ module.exports = {
     device: 'cpu',
   },
 
-  // {name} is replaced with the member's (cleaned) display name.
+  // {name} is replaced with the member's cleaned display name.
   messageTemplate: '{name} has joined',
-
-  // Used when nothing readable is left of the name.
   fallbackName: 'Someone',
 
   // Discord display names are at most 32 characters, so a message is never
@@ -21,13 +18,10 @@ module.exports = {
   maxTextLength: 100,
 
   timeouts: {
-    // Generating speech for one announcement.
     ttsMs: 10_000,
-    // Connecting to a voice channel.
     connectMs: 15_000,
-    // Waiting for a lost connection to recover before giving up.
+    // How long a lost connection may try to recover before it is closed.
     reconnectMs: 5_000,
-    // Playing one announcement.
     playbackMs: 20_000,
   },
 };
