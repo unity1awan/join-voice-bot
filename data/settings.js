@@ -2,13 +2,16 @@ module.exports = {
   // Language code for Google text-to-speech.
   language: 'en',
 
+  // Google text-to-speech endpoint.
+  ttsUrl: 'https://translate.google.com/translate_tts',
+
   // {name} is replaced with the member's (cleaned) display name.
   messageTemplate: '{name} has joined',
 
   // Used when nothing readable is left of the name.
   fallbackName: 'Someone',
 
-  // google-tts-api accepts at most 200 characters per request.
+  // Google text-to-speech accepts at most 200 characters per request.
   maxTextLength: 200,
 
   timeouts: {
